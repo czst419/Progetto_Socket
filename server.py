@@ -29,9 +29,11 @@ def check_winner():
 
 def handle_client(conn, player):
     global turn
+    control = 0
     conn.sendall(f"Benvenuto! Sei il giocatore {player}\n".encode())
     while True:
         if turn == player:
+            control = 0
             conn.sendall("TOCCA A TE. Inserisci una posizione (0-8): ".encode())
             data = conn.recv(1024).decode().strip()
             if not data.isdigit() or int(data) not in range(9) or game_board[int(data)] != ' ':
@@ -47,7 +49,9 @@ def handle_client(conn, player):
                 break
             turn = 'O' if turn == 'X' else 'X'
         else:
-            conn.sendall("Aspetta il tuo turno...\n".encode())
+            if control == 0:
+                conn.sendall("Aspetta il tuo turno...\n".encode())
+                control = 1
 
 
 def start_server():
